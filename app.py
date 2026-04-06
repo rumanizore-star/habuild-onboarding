@@ -41,10 +41,36 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
+# Migrate database schema - add missing columns to existing tables
+def migrate_db():
+    with app.app_context():
+        try:
+            # Add missing columns to new_joiner table if they don't exist
+            from sqlalchemy import text
+
+            missing_columns = {
+                'employment_type': 'VARCHAR(100)',
+                'contact_number': 'VARCHAR(20)',
+                'personal_email': 'VARCHAR(120)',
+                'date_of_birth': 'DATE'
+            }
+
+            # Check which columns are missing and add them
+            for col_name, col_type in missing_columns.items():
+                try:
+                    db.session.execute(text(f"ALTER TABLE new_joiner ADD COLUMN {col_name} {col_type}"))
+                    db.session.commit()
+                except Exception:
+                    # Column already exists, skip
+                    pass
+        except Exception as e:
+            print(f"Migration warning: {e}")
+
 # Initialize database and seed data on app startup
 def init_db():
     with app.app_context():
         db.create_all()
+        migrate_db()  # Run migrations after creating tables
         if User.query.count() == 0:  # Only seed if no users exist
             users_data = [
                 ('HR Admin', 'hr@habuild.in', 'Onboarding@123', 'admin', 'HR', 'Nagpur'),
