@@ -41,6 +41,39 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
+# Initialize database and seed data on app startup
+def init_db():
+    with app.app_context():
+        db.create_all()
+        if User.query.count() == 0:  # Only seed if no users exist
+            users_data = [
+                ('HR Admin', 'hr@habuild.in', 'Onboarding@123', 'admin', 'HR', 'Nagpur'),
+                ('Rumani Zore', 'rumani.zore@habuild.in', 'Onboarding@123', 'admin', 'HR', 'Nagpur'),
+                ('Saurabh Bothra', 'saurabhbothra@habuild.in', 'Onboarding@123', 'admin', 'Leadership', 'Nagpur'),
+                ('Team Manager 1', 'manager1@habuild.in', 'Onboarding@123', 'manager', 'Customer Support', 'Nagpur'),
+                ('Team Manager 2', 'manager2@habuild.in', 'Onboarding@123', 'manager', 'Operations', 'Mumbai'),
+            ]
+            users = []
+            for name, email, pwd, role, dept, loc in users_data:
+                u = User(name=name, email=email, password_hash=generate_password_hash(pwd),
+                         role=role, department=dept, location=loc)
+                db.session.add(u)
+                users.append(u)
+            db.session.commit()
+
+            mgr = User.query.filter_by(email='manager1@habuild.in').first()
+            sample_joiners = [
+                ('Priya Sharma', 'priya.sharma@habuild.in', 'Customer Support Executive', 'Customer Support', 'Nagpur', date.today() - timedelta(days=25)),
+                ('Rohit Verma', 'rohit.verma@habuild.in', 'Customer Support Executive', 'Customer Support', 'Nagpur', date.today() - timedelta(days=5)),
+                ('Sneha Kulkarni', 'sneha.kulkarni@habuild.in', 'Customer Support Executive', 'Customer Support', 'Nagpur', date.today()),
+            ]
+            for name, email, role_title, dept, loc, jdate in sample_joiners:
+                j = NewJoiner(name=name, email=email, role_title=role_title,
+                              department=dept, location=loc, manager_id=mgr.id, joining_date=jdate)
+                db.session.add(j)
+                db.session.flush()
+                create_default_tasks(j.id, jdate)
+
 # ── MODELS ──────────────────────────────────────────────────
 
 class User(db.Model):
@@ -234,6 +267,16 @@ def get_joiner_stats(joiner):
             'color': progress_color(pct)}
 
 # ── ROUTES ──────────────────────────────────────────────────
+
+# Initialize database on first request (works with Gunicorn too)
+_db_initialized = False
+
+@app.before_request
+def initialize_db():
+    global _db_initialized
+    if not _db_initialized:
+        init_db()
+        _db_initialized = True
 
 @app.route('/')
 def index():
