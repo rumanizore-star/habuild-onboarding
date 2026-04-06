@@ -114,14 +114,18 @@
   {% if tasks_by_cat.get(cat) %}
   {% set cat_tasks = tasks_by_cat[cat] %}
   {% set cat_done = cat_tasks | selectattr('status','eq','done') | list | length %}
+  {% set is_collapsible = cat in ['pre_joining', 'day1', 'week1'] %}
   <div class="card task-section">
-    <div class="card-header">
-      {{ cat_labels[cat] }} Tasks
+    <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;cursor:{% if is_collapsible %}pointer{% else %}default{% endif %};" {% if is_collapsible %}onclick="toggleSection(this)"{% endif %}>
+      <div style="display:flex;align-items:center;gap:10px;flex:1;">
+        {% if is_collapsible %}<span class="toggle-icon" style="font-size:18px;transition:transform 0.3s;">▼</span>{% endif %}
+        <span>{{ cat_labels[cat] }} Tasks</span>
+      </div>
       <span class="badge {% if cat_done == cat_tasks|length %}badge-green{% elif cat_done > 0 %}badge-amber{% else %}badge-grey{% endif %}">
         {{ cat_done }}/{{ cat_tasks|length }}
       </span>
     </div>
-    <div class="card-body">
+    <div class="card-body" {% if is_collapsible %}style="display:none;"{% endif %}>
       {% for task in cat_tasks %}
       <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #f3f4f6;">
         <div class="task-item">
@@ -289,4 +293,19 @@
   </div>
 </div>
 {% endif %}
+
+<script>
+function toggleSection(headerElement) {
+  const cardBody = headerElement.nextElementSibling;
+  const toggleIcon = headerElement.querySelector('.toggle-icon');
+
+  if (cardBody.style.display === 'none') {
+    cardBody.style.display = '';
+    toggleIcon.style.transform = 'rotate(0deg)';
+  } else {
+    cardBody.style.display = 'none';
+    toggleIcon.style.transform = 'rotate(-90deg)';
+  }
+}
+</script>
 {% endblock %}
