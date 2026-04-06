@@ -44,8 +44,12 @@
     <div class="card-header">Joiner Details</div>
     <div class="card-body">
       <table style="width:100%;">
-        <tr><td class="text-sm text-grey" style="padding:5px 0;width:40%;">Email</td><td class="text-sm">{{ joiner.email }}</td></tr>
+        <tr><td class="text-sm text-grey" style="padding:5px 0;width:40%;">Official Email</td><td class="text-sm">{{ joiner.email }}</td></tr>
+        <tr><td class="text-sm text-grey" style="padding:5px 0;">Personal Email</td><td class="text-sm">{{ joiner.personal_email if joiner.personal_email else '—' }}</td></tr>
+        <tr><td class="text-sm text-grey" style="padding:5px 0;">Contact Number</td><td class="text-sm">{{ joiner.contact_number if joiner.contact_number else '—' }}</td></tr>
+        <tr><td class="text-sm text-grey" style="padding:5px 0;">Date of Birth</td><td class="text-sm">{{ joiner.date_of_birth.strftime('%d %b %Y') if joiner.date_of_birth else '—' }}</td></tr>
         <tr><td class="text-sm text-grey" style="padding:5px 0;">Department</td><td class="text-sm">{{ joiner.department }}</td></tr>
+        <tr><td class="text-sm text-grey" style="padding:5px 0;">Employment Type</td><td class="text-sm">{{ joiner.employment_type if joiner.employment_type else '—' }}</td></tr>
         <tr><td class="text-sm text-grey" style="padding:5px 0;">Location</td><td class="text-sm">{{ joiner.location }}</td></tr>
         <tr><td class="text-sm text-grey" style="padding:5px 0;">Manager</td><td class="text-sm">{{ joiner.manager.name if joiner.manager else '—' }}</td></tr>
         <tr><td class="text-sm text-grey" style="padding:5px 0;">Joining Date</td><td class="text-sm">{{ joiner.joining_date.strftime('%d %b %Y') if joiner.joining_date else '—' }}</td></tr>

@@ -93,6 +93,10 @@ class NewJoiner(db.Model):
     role_title = db.Column(db.String(100))
     department = db.Column(db.String(100))
     location = db.Column(db.String(100))
+    employment_type = db.Column(db.String(100))
+    contact_number = db.Column(db.String(20))
+    personal_email = db.Column(db.String(120))
+    date_of_birth = db.Column(db.Date)
     manager_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     joining_date = db.Column(db.Date)
     status = db.Column(db.String(30), default='active')  # active / completed / exited
@@ -518,12 +522,21 @@ def add_joiner():
             db.session.add(manager)
             db.session.flush()
 
+        # Parse date of birth if provided
+        dob = None
+        if request.form.get('date_of_birth'):
+            dob = datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d').date()
+
         j = NewJoiner(
             name=request.form['name'],
             email=request.form['email'].lower(),
             role_title=request.form['role_title'],
             department=request.form['department'],
             location=request.form['location'],
+            employment_type=request.form.get('employment_type', '').strip(),
+            contact_number=request.form.get('contact_number', '').strip(),
+            personal_email=request.form.get('personal_email', '').lower().strip() if request.form.get('personal_email') else None,
+            date_of_birth=dob,
             manager_id=manager.id,
             joining_date=joining_date,
         )
