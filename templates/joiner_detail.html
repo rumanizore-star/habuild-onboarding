@@ -108,10 +108,10 @@
   </div>
 </div>
 
-<!-- 30-60-90 Day Onboarding Plan -->
+<!-- 30-60-90 Day Performance Review Status -->
 <div class="card" style="margin-bottom:24px;">
   <div class="card-header flex justify-between items-center">
-    <span>30-60-90 Day Onboarding Plan</span>
+    <span>30-60-90 days Performance Review Status</span>
     {% if session.role in ('admin', 'manager') or session.user_id == joiner.manager_id %}
     <a href="/joiner/{{ joiner.id }}/plan" class="btn btn-outline btn-sm">View / Edit Plan</a>
     {% endif %}
