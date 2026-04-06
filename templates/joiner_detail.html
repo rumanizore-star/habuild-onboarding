@@ -166,31 +166,6 @@
   {% endif %}
 {% endfor %}
 
-<!-- HR Internal Notes -->
-{% if session.role == 'admin' %}
-<div class="card" id="hr-notes" style="margin-top:24px;">
-  <div class="card-header">HR Internal Notes <span class="text-sm text-grey" style="font-weight:400;">(visible to HR/admin only)</span></div>
-  <div class="card-body">
-    <form method="POST" action="/joiner/{{ joiner.id }}/add-note" style="display:flex;gap:10px;align-items:flex-end;margin-bottom:20px;">
-      <div style="flex:1;">
-        <textarea name="note" class="form-control" rows="2" placeholder="Add a note about this joiner (e.g. background check status, concerns, observations)..." required></textarea>
-      </div>
-      <button type="submit" class="btn btn-primary" style="white-space:nowrap;">Add Note</button>
-    </form>
-    {% if notes %}
-      {% for n in notes %}
-      <div style="padding:12px 0;border-bottom:1px solid #f3f4f6;">
-        <div class="text-sm" style="color:#1f2937;">{{ n.note }}</div>
-        <div class="text-sm text-grey" style="margin-top:4px;">{{ n.author.name }} &middot; {{ n.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
-      </div>
-      {% endfor %}
-    {% else %}
-      <div class="text-sm text-grey">No notes yet.</div>
-    {% endif %}
-  </div>
-</div>
-{% endif %}
-
 <!-- 30-60-90 Day Goals -->
 {% if session.role in ('admin', 'manager') %}
 <div class="card" style="margin-bottom:24px;">
@@ -289,4 +264,29 @@
     {% endif %}
   </div>
 </div>
+
+<!-- HR Internal Notes -->
+{% if session.role == 'admin' %}
+<div class="card" id="hr-notes" style="margin-top:24px;">
+  <div class="card-header">HR Internal Notes <span class="text-sm text-grey" style="font-weight:400;">(visible to HR/admin only)</span></div>
+  <div class="card-body">
+    <form method="POST" action="/joiner/{{ joiner.id }}/add-note" style="display:flex;gap:10px;align-items:flex-end;margin-bottom:20px;">
+      <div style="flex:1;">
+        <textarea name="note" class="form-control" rows="2" placeholder="Add a note about this joiner (e.g. background check status, concerns, observations)..." required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary" style="white-space:nowrap;">Add Note</button>
+    </form>
+    {% if notes %}
+      {% for n in notes %}
+      <div style="padding:12px 0;border-bottom:1px solid #f3f4f6;">
+        <div class="text-sm" style="color:#1f2937;">{{ n.note }}</div>
+        <div class="text-sm text-grey" style="margin-top:4px;">{{ n.author.name }} &middot; {{ n.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="text-sm text-grey">No notes yet.</div>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
 {% endblock %}
