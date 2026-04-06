@@ -50,3 +50,4 @@ instance/habuild_onboarding.db
 
 # Logs
 *.log
+.claude/
