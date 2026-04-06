@@ -51,13 +51,9 @@
         </div>
       </div>
       <div class="form-group">
-        <label>Reporting Manager *</label>
-        <select name="manager_id" class="form-control" required>
-          <option value="">Select manager</option>
-          {% for m in managers %}
-          <option value="{{ m.id }}">{{ m.name }} ({{ m.department }})</option>
-          {% endfor %}
-        </select>
+        <label>Reporting Manager (Name or Email) *</label>
+        <input type="text" name="manager_name" class="form-control" required placeholder="e.g. John Doe or john@habuild.in">
+        <small style="color:#6b7280;margin-top:4px;display:block;">Type manager name or email. If manager doesn't exist, they'll be auto-created.</small>
       </div>
       <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px;">
         <a href="/dashboard" class="btn btn-outline">Cancel</a>

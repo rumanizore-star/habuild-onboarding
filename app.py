@@ -479,16 +479,44 @@ def evaluate(joiner_id, period):
 @app.route('/add-joiner', methods=['GET', 'POST'])
 @admin_required
 def add_joiner():
-    managers = User.query.filter(User.role.in_(['admin', 'manager'])).all()
     if request.method == 'POST':
         joining_date = datetime.strptime(request.form['joining_date'], '%Y-%m-%d').date()
+        manager_input = request.form['manager_name'].strip()
+
+        # Find or create manager
+        manager = User.query.filter(
+            (User.name == manager_input) | (User.email == manager_input.lower())
+        ).first()
+
+        if not manager:
+            # Auto-create new manager if doesn't exist
+            # Generate email from name if only name provided
+            if '@' in manager_input:
+                manager_email = manager_input.lower()
+                manager_name = manager_input.split('@')[0].replace('.', ' ').title()
+            else:
+                manager_name = manager_input
+                # Generate email: firstname.lastname@habuild.in
+                manager_email = manager_name.lower().replace(' ', '.') + '@habuild.in'
+
+            manager = User(
+                name=manager_name,
+                email=manager_email,
+                password_hash=generate_password_hash('TempPassword@123'),
+                role='manager',
+                department=request.form['department'],
+                location=request.form['location'],
+            )
+            db.session.add(manager)
+            db.session.flush()
+
         j = NewJoiner(
             name=request.form['name'],
             email=request.form['email'].lower(),
             role_title=request.form['role_title'],
             department=request.form['department'],
             location=request.form['location'],
-            manager_id=int(request.form['manager_id']),
+            manager_id=manager.id,
             joining_date=joining_date,
         )
         db.session.add(j)
@@ -496,7 +524,7 @@ def add_joiner():
         create_default_tasks(j.id, joining_date)
         flash(f'{j.name} added successfully!', 'success')
         return redirect(url_for('joiner_detail', joiner_id=j.id))
-    return render_template('add_joiner.html', managers=managers)
+    return render_template('add_joiner.html')
 
 @app.route('/add-user', methods=['GET', 'POST'])
 @admin_required
