@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+{% block title %}30-60-90 Day Plan — {{ joiner.name }}{% endblock %}
+{% block content %}
+<div class="page-header flex justify-between items-center">
+  <div>
+    <a href="/joiner/{{ joiner.id }}" class="text-sm text-grey">&#8592; Back to {{ joiner.name }}'s Journey</a>
+    <h2 style="margin-top:6px;">30-60-90 Day Plan</h2>
+    <p>{{ joiner.name }} &middot; {{ joiner.role_title }} &middot; {{ joiner.department }}</p>
+  </div>
+</div>
+
+<div class="card" style="max-width:1000px;">
+  <div class="card-header">Joiner Information</div>
+  <div class="card-body">
+    <div class="grid-2">
+      <div>
+        <div class="text-sm text-grey" style="margin-bottom:4px;">Name</div>
+        <div style="font-weight:600;">{{ joiner.name }}</div>
+      </div>
+      <div>
+        <div class="text-sm text-grey" style="margin-bottom:4px;">Department</div>
+        <div style="font-weight:600;">{{ joiner.department }}</div>
+      </div>
+      <div>
+        <div class="text-sm text-grey" style="margin-bottom:4px;">Designation</div>
+        <div style="font-weight:600;">{{ joiner.role_title }}</div>
+      </div>
+      <div>
+        <div class="text-sm text-grey" style="margin-bottom:4px;">Joining Date</div>
+        <div style="font-weight:600;">{{ joiner.joining_date.strftime('%d %b %Y') if joiner.joining_date else '—' }}</div>
+      </div>
+      <div>
+        <div class="text-sm text-grey" style="margin-bottom:4px;">Reporting Manager</div>
+        <div style="font-weight:600;">{{ joiner.manager.name if joiner.manager else '—' }}</div>
+      </div>
+      <div>
+        <div class="text-sm text-grey" style="margin-bottom:4px;">Days In Office</div>
+        <div style="font-weight:600;">{{ stats.days_in }} days</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if can_edit %}
+<form method="POST" style="margin-top:24px;">
+
+<div class="card" style="margin-bottom:24px;">
+  <div class="card-header">30-60-90 Day Plan Details</div>
+  <div class="card-body">
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="background:#f5f5f5;">
+          <th style="padding:12px;text-align:left;border-bottom:2px solid #e2e8f0;font-weight:700;font-size:13px;">Period</th>
+          <th style="padding:12px;text-align:left;border-bottom:2px solid #e2e8f0;font-weight:700;font-size:13px;">Expected Goals</th>
+          <th style="padding:12px;text-align:left;border-bottom:2px solid #e2e8f0;font-weight:700;font-size:13px;">Status</th>
+          <th style="padding:12px;text-align:left;border-bottom:2px solid #e2e8f0;font-weight:700;font-size:13px;">Manager Comments</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- 30-day row -->
+        <tr style="border-bottom:1px solid #e2e8f0;">
+          <td style="padding:12px;font-weight:600;color:#1565C0;">30-Day</td>
+          <td style="padding:12px;">
+            <textarea name="goals_30" class="form-control" placeholder="What are the expected goals for the first 30 days?" rows="4" {% if not can_edit %}readonly{% endif %}>{{ plan.goals_30 if plan.goals_30 else '' }}</textarea>
+          </td>
+          <td style="padding:12px;vertical-align:top;">
+            <select name="status_30" class="form-control" {% if not can_edit %}disabled{% endif %}>
+              <option value="pending" {% if plan.status_30 == 'pending' %}selected{% endif %}>Not Started</option>
+              <option value="on_track" {% if plan.status_30 == 'on_track' %}selected{% endif %}>On Track</option>
+              <option value="achieved" {% if plan.status_30 == 'achieved' %}selected{% endif %}>Achieved</option>
+              <option value="needs_improvement" {% if plan.status_30 == 'needs_improvement' %}selected{% endif %}>Needs Improvement</option>
+              <option value="delayed" {% if plan.status_30 == 'delayed' %}selected{% endif %}>Delayed</option>
+            </select>
+          </td>
+          <td style="padding:12px;">
+            <textarea name="comments_30" class="form-control" placeholder="Manager comments..." rows="4" {% if not can_edit %}readonly{% endif %}>{{ plan.comments_30 if plan.comments_30 else '' }}</textarea>
+          </td>
+        </tr>
+
+        <!-- 60-day row -->
+        <tr style="border-bottom:1px solid #e2e8f0;">
+          <td style="padding:12px;font-weight:600;color:#1565C0;">60-Day</td>
+          <td style="padding:12px;">
+            <textarea name="goals_60" class="form-control" placeholder="What are the expected goals for the first 60 days?" rows="4" {% if not can_edit %}readonly{% endif %}>{{ plan.goals_60 if plan.goals_60 else '' }}</textarea>
+          </td>
+          <td style="padding:12px;vertical-align:top;">
+            <select name="status_60" class="form-control" {% if not can_edit %}disabled{% endif %}>
+              <option value="pending" {% if plan.status_60 == 'pending' %}selected{% endif %}>Not Started</option>
+              <option value="on_track" {% if plan.status_60 == 'on_track' %}selected{% endif %}>On Track</option>
+              <option value="achieved" {% if plan.status_60 == 'achieved' %}selected{% endif %}>Achieved</option>
+              <option value="needs_improvement" {% if plan.status_60 == 'needs_improvement' %}selected{% endif %}>Needs Improvement</option>
+              <option value="delayed" {% if plan.status_60 == 'delayed' %}selected{% endif %}>Delayed</option>
+            </select>
+          </td>
+          <td style="padding:12px;">
+            <textarea name="comments_60" class="form-control" placeholder="Manager comments..." rows="4" {% if not can_edit %}readonly{% endif %}>{{ plan.comments_60 if plan.comments_60 else '' }}</textarea>
+          </td>
+        </tr>
+
+        <!-- 90-day row -->
+        <tr>
+          <td style="padding:12px;font-weight:600;color:#1565C0;">90-Day</td>
+          <td style="padding:12px;">
+            <textarea name="goals_90" class="form-control" placeholder="What are the expected goals for the first 90 days?" rows="4" {% if not can_edit %}readonly{% endif %}>{{ plan.goals_90 if plan.goals_90 else '' }}</textarea>
+          </td>
+          <td style="padding:12px;vertical-align:top;">
+            <select name="status_90" class="form-control" {% if not can_edit %}disabled{% endif %}>
+              <option value="pending" {% if plan.status_90 == 'pending' %}selected{% endif %}>Not Started</option>
+              <option value="on_track" {% if plan.status_90 == 'on_track' %}selected{% endif %}>On Track</option>
+              <option value="achieved" {% if plan.status_90 == 'achieved' %}selected{% endif %}>Achieved</option>
+              <option value="needs_improvement" {% if plan.status_90 == 'needs_improvement' %}selected{% endif %}>Needs Improvement</option>
+              <option value="delayed" {% if plan.status_90 == 'delayed' %}selected{% endif %}>Delayed</option>
+            </select>
+          </td>
+          <td style="padding:12px;">
+            <textarea name="comments_90" class="form-control" placeholder="Manager comments..." rows="4" {% if not can_edit %}readonly{% endif %}>{{ plan.comments_90 if plan.comments_90 else '' }}</textarea>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom:24px;">
+  <div class="card-header">Additional Plan Information</div>
+  <div class="card-body">
+    <div class="form-section" style="margin-bottom:20px;">
+      <h3 style="margin-bottom:8px;">Training & Support Required</h3>
+      <textarea name="training_support" class="form-control" placeholder="Describe the training and support required..." rows="4" {% if not can_edit %}readonly{% endif %}>{{ plan.training_support if plan.training_support else '' }}</textarea>
+    </div>
+
+    <div class="form-section" style="margin-bottom:20px;">
+      <h3 style="margin-bottom:8px;">Manager Recommendation</h3>
+      <textarea name="manager_recommendation" class="form-control" placeholder="Manager's overall recommendation..." rows="4" {% if not can_edit %}readonly{% endif %}>{{ plan.manager_recommendation if plan.manager_recommendation else '' }}</textarea>
+    </div>
+
+    <div class="form-section" style="margin-bottom:0;">
+      <h3 style="margin-bottom:8px;">Next Action Plan</h3>
+      <textarea name="next_action_plan" class="form-control" placeholder="What are the next steps?" rows="4" {% if not can_edit %}readonly{% endif %}>{{ plan.next_action_plan if plan.next_action_plan else '' }}</textarea>
+    </div>
+  </div>
+</div>
+
+{% if can_edit %}
+<div style="display:flex;gap:12px;justify-content:flex-end;margin-bottom:24px;">
+  <a href="/joiner/{{ joiner.id }}" class="btn btn-outline">Cancel</a>
+  <button type="submit" class="btn btn-primary">Save 30-60-90 Plan</button>
+</div>
+{% endif %}
+
+</form>
+
+{% else %}
+
+<div class="card" style="margin-top:24px;">
+  <div class="card-header">30-60-90 Day Plan (View Only)</div>
+  <div class="card-body">
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="background:#f5f5f5;">
+          <th style="padding:12px;text-align:left;border-bottom:2px solid #e2e8f0;font-weight:700;font-size:13px;">Period</th>
+          <th style="padding:12px;text-align:left;border-bottom:2px solid #e2e8f0;font-weight:700;font-size:13px;">Expected Goals</th>
+          <th style="padding:12px;text-align:left;border-bottom:2px solid #e2e8f0;font-weight:700;font-size:13px;">Status</th>
+          <th style="padding:12px;text-align:left;border-bottom:2px solid #e2e8f0;font-weight:700;font-size:13px;">Manager Comments</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid #e2e8f0;">
+          <td style="padding:12px;font-weight:600;color:#1565C0;">30-Day</td>
+          <td style="padding:12px;color:#6b7280;">{{ plan.goals_30 if plan.goals_30 else '—' }}</td>
+          <td style="padding:12px;"><span class="badge badge-blue">{{ plan.status_30|replace('_',' ')|capitalize if plan.status_30 else 'Not Started' }}</span></td>
+          <td style="padding:12px;color:#6b7280;">{{ plan.comments_30 if plan.comments_30 else '—' }}</td>
+        </tr>
+        <tr style="border-bottom:1px solid #e2e8f0;">
+          <td style="padding:12px;font-weight:600;color:#1565C0;">60-Day</td>
+          <td style="padding:12px;color:#6b7280;">{{ plan.goals_60 if plan.goals_60 else '—' }}</td>
+          <td style="padding:12px;"><span class="badge badge-blue">{{ plan.status_60|replace('_',' ')|capitalize if plan.status_60 else 'Not Started' }}</span></td>
+          <td style="padding:12px;color:#6b7280;">{{ plan.comments_60 if plan.comments_60 else '—' }}</td>
+        </tr>
+        <tr>
+          <td style="padding:12px;font-weight:600;color:#1565C0;">90-Day</td>
+          <td style="padding:12px;color:#6b7280;">{{ plan.goals_90 if plan.goals_90 else '—' }}</td>
+          <td style="padding:12px;"><span class="badge badge-blue">{{ plan.status_90|replace('_',' ')|capitalize if plan.status_90 else 'Not Started' }}</span></td>
+          <td style="padding:12px;color:#6b7280;">{{ plan.comments_90 if plan.comments_90 else '—' }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    {% if plan.training_support or plan.manager_recommendation or plan.next_action_plan %}
+    <div style="margin-top:24px;">
+      {% if plan.training_support %}
+      <div class="form-section" style="margin-bottom:16px;">
+        <h3 style="margin-bottom:8px;">Training & Support Required</h3>
+        <div class="text-sm">{{ plan.training_support }}</div>
+      </div>
+      {% endif %}
+
+      {% if plan.manager_recommendation %}
+      <div class="form-section" style="margin-bottom:16px;">
+        <h3 style="margin-bottom:8px;">Manager Recommendation</h3>
+        <div class="text-sm">{{ plan.manager_recommendation }}</div>
+      </div>
+      {% endif %}
+
+      {% if plan.next_action_plan %}
+      <div class="form-section" style="margin-bottom:0;">
+        <h3 style="margin-bottom:8px;">Next Action Plan</h3>
+        <div class="text-sm">{{ plan.next_action_plan }}</div>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endif %}
+
+{% endblock %}

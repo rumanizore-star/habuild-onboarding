@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Add New Joiner — Habuild{% endblock %}
+{% block content %}
+<div class="page-header">
+  <a href="/dashboard" class="text-sm text-grey">&#8592; Back to Dashboard</a>
+  <h2 style="margin-top:6px;">Add New Joiner</h2>
+  <p>All onboarding tasks will be auto-created based on the joining date</p>
+</div>
+<div class="card" style="max-width:640px;">
+  <div class="card-header">New Joiner Details</div>
+  <div class="card-body">
+    <form method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" name="name" class="form-control" required placeholder="e.g. Priya Sharma">
+        </div>
+        <div class="form-group">
+          <label>Official Email *</label>
+          <input type="email" name="email" class="form-control" required placeholder="priya@habuild.in">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Role / Title *</label>
+          <input type="text" name="role_title" class="form-control" required placeholder="e.g. Customer Support Executive">
+        </div>
+        <div class="form-group">
+          <label>Department *</label>
+          <select name="department" class="form-control" required>
+            <option value="">Select department</option>
+            {% for d in ['Customer Support','Product','Technology','Operations','Marketing','Finance','HR','Leadership'] %}
+            <option>{{ d }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Location *</label>
+          <select name="location" class="form-control" required>
+            <option value="">Select location</option>
+            {% for l in ['Nagpur','Mumbai','Pune','Bangalore','Delhi','Remote'] %}
+            <option>{{ l }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Joining Date *</label>
+          <input type="date" name="joining_date" class="form-control" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Reporting Manager *</label>
+        <select name="manager_id" class="form-control" required>
+          <option value="">Select manager</option>
+          {% for m in managers %}
+          <option value="{{ m.id }}">{{ m.name }} ({{ m.department }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px;">
+        <a href="/dashboard" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">Add Joiner &amp; Create Tasks</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

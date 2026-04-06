@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}{{ period }}-Day Evaluation — {{ joiner.name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <a href="/joiner/{{ joiner.id }}" class="text-sm text-grey">&#8592; Back to {{ joiner.name }}'s Journey</a>
+  <h2 style="margin-top:6px;">{{ period }}-Day Manager Evaluation</h2>
+  <p>{{ joiner.name }} &middot; {{ joiner.role_title }} &middot; {{ joiner.department }}</p>
+</div>
+
+{% if existing %}
+<div class="alert alert-success">This evaluation was previously submitted on {{ existing.submitted_at.strftime('%d %b %Y') }}. You can update it below.</div>
+{% endif %}
+
+<div class="card" style="max-width:680px;">
+  <div class="card-header">{{ period }}-Day Performance Review Form</div>
+  <div class="card-body">
+    <form method="POST">
+
+      <div class="form-section">
+        <h3>Overall Rating</h3>
+        <p class="text-sm text-grey" style="margin-bottom:10px;">How would you rate {{ joiner.name }}'s overall performance in the first {{ period }} days?</p>
+        <div class="star-rating" style="flex-direction:row-reverse;justify-content:flex-end;">
+          {% for i in [5,4,3,2,1] %}
+          <input type="radio" name="rating" id="star{{ i }}" value="{{ i }}"
+            {% if existing and existing.rating == i %}checked{% elif not existing and i == 3 %}checked{% endif %}>
+          <label for="star{{ i }}">&#9733;</label>
+          {% endfor %}
+        </div>
+        <div class="text-sm text-grey" style="margin-top:4px;">1 = Needs improvement &nbsp;|&nbsp; 3 = Meeting expectations &nbsp;|&nbsp; 5 = Exceeding expectations</div>
+      </div>
+
+      <div class="form-section">
+        <h3>Strengths Observed</h3>
+        <div class="form-group" style="margin:0;">
+          <textarea name="strengths" class="form-control" placeholder="What has {{ joiner.name }} done really well? What strengths have you noticed in the first {{ period }} days?" rows="4">{{ existing.strengths if existing else '' }}</textarea>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Areas for Improvement</h3>
+        <div class="form-group" style="margin:0;">
+          <textarea name="improvements" class="form-control" placeholder="What should {{ joiner.name }} focus on improving? Any specific behaviours or skills to work on?" rows="4">{{ existing.improvements if existing else '' }}</textarea>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Goals for Next Period</h3>
+        <div class="form-group" style="margin:0;">
+          <textarea name="goals_next" class="form-control" placeholder="What are the specific goals and expectations for the next 30 days?" rows="4">{{ existing.goals_next if existing else '' }}</textarea>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Confirmation Recommendation</h3>
+        <p class="text-sm text-grey" style="margin-bottom:10px;">Based on performance so far, what is your recommendation?</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          {% for val, label, desc in [
+            ('yes','Confirm Employment','Performance meets expectations — recommend confirmation'),
+            ('extend','Extend Probation','Needs more time — recommend extending probation by 30 days'),
+            ('no','Do Not Confirm','Performance does not meet expectations')
+          ] %}
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:12px;border:1.5px solid #e5e7eb;border-radius:8px;{% if existing and existing.recommend_confirm == val %}border-color:#1565C0;background:#EFF8FF;{% endif %}">
+            <input type="radio" name="recommend_confirm" value="{{ val }}" style="margin-top:2px;"
+              {% if existing and existing.recommend_confirm == val %}checked{% elif not existing and val == 'yes' %}checked{% endif %}>
+            <div>
+              <div style="font-weight:600;font-size:13px;">{{ label }}</div>
+              <div class="text-sm text-grey">{{ desc }}</div>
+            </div>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px;">
+        <a href="/joiner/{{ joiner.id }}" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">
+          {{ 'Update' if existing else 'Submit' }} {{ period }}-Day Evaluation
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

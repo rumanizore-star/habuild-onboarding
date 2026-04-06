@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Manage Users — Habuild{% endblock %}
+{% block content %}
+<div class="page-header flex justify-between items-center">
+  <div>
+    <h2>Platform Users</h2>
+    <p>All users with access to the Habuild Onboarding Platform</p>
+  </div>
+  <a href="/add-user" class="btn btn-primary">&#43; Add User</a>
+</div>
+<div class="card">
+  <div class="card-body" style="padding:0;">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Email</th><th>Role</th><th>Department</th><th>Location</th><th>Added</th></tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td style="font-weight:600;">{{ u.name }}</td>
+            <td class="text-sm">{{ u.email }}</td>
+            <td>
+              <span class="badge {% if u.role == 'admin' %}badge-green{% elif u.role == 'manager' %}badge-blue{% else %}badge-grey{% endif %}">
+                {{ u.role|capitalize }}
+              </span>
+            </td>
+            <td>{{ u.department or '—' }}</td>
+            <td>{{ u.location or '—' }}</td>
+            <td class="text-sm text-grey">{{ u.created_at.strftime('%d %b %Y') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

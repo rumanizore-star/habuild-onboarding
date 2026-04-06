@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Habuild — Onboarding Platform</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="login-page">
+  <div class="login-box">
+    <div class="brand">
+      <h1>HABUILD</h1>
+      <p>Onboarding Platform</p>
+    </div>
+    <p class="tagline">"Sabse mushkil kaam toh ho gaya — you showed up."</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ 'success' if cat == 'success' else 'error' }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="/login">
+      <div class="form-group">
+        <label>Official Email</label>
+        <input type="email" name="email" class="form-control" placeholder="you@habuild.in" required autofocus>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+      </div>
+      <button type="submit" class="btn btn-primary w-full" style="justify-content:center;margin-top:8px;">
+        Sign In
+      </button>
+    </form>
+    <p class="text-sm text-grey" style="text-align:center;margin-top:20px;">
+      Habuild Healthtech Private Limited &copy; 2026
+    </p>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}My Onboarding — Habuild{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2>My Onboarding Journey</h2>
+  <p>Welcome to Habuild. Your streak starts here.</p>
+</div>
+
+{% if not joiner %}
+<div class="card"><div class="card-body" style="text-align:center;padding:40px;">
+  <p style="color:#6b7280;">Your onboarding profile hasn't been set up yet. Please contact HR.</p>
+</div></div>
+{% else %}
+<div class="card" style="margin-bottom:24px;border-left:4px solid #1565C0;">
+  <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+    <div>
+      <div style="font-size:22px;font-weight:700;">Welcome, {{ joiner.name }} &#127807;</div>
+      <div class="text-grey text-sm">{{ joiner.role_title }} &middot; {{ joiner.department }} &middot; {{ joiner.location }}</div>
+      <div class="text-sm" style="margin-top:4px;color:#1565C0;font-weight:600;">
+        Day {{ stats.days_in }} &middot; {{ stats.phase }}
+      </div>
+    </div>
+    <div style="text-align:center;">
+      <div style="font-size:36px;font-weight:800;color:{{ stats.color }};">{{ stats.pct }}%</div>
+      <div class="text-sm text-grey">{{ stats.done }}/{{ stats.total }} tasks done</div>
+    </div>
+  </div>
+  <div style="padding:0 20px 16px;">
+    <div class="progress-bar-wrap" style="height:10px;">
+      <div class="progress-bar" style="width:{{ stats.pct }}%;background:{{ stats.color }};height:10px;"></div>
+    </div>
+  </div>
+</div>
+
+{% set cat_labels = {'pre_joining':'Pre-Joining','day1':'Day 1','week1':'Week 1','day30':'30 Days','day60':'60 Days','day90':'90 Days'} %}
+{% for cat in ['pre_joining','day1','week1','day30','day60','day90'] %}
+  {% if tasks_by_cat.get(cat) %}
+  {% set cat_tasks = tasks_by_cat[cat] %}
+  {% set cat_done = cat_tasks | selectattr('status','eq','done') | list | length %}
+  <div class="card task-section">
+    <div class="card-header">
+      {{ cat_labels[cat] }}
+      <span class="badge {% if cat_done == cat_tasks|length %}badge-green{% elif cat_done > 0 %}badge-amber{% else %}badge-grey{% endif %}">
+        {{ cat_done }}/{{ cat_tasks|length }} done
+      </span>
+    </div>
+    <div class="card-body">
+      {% for task in cat_tasks %}
+      <div class="task-item">
+        <div class="task-check {{ 'done' if task.status == 'done' else '' }}" style="cursor:default;">
+          {% if task.status == 'done' %}&#10003;{% endif %}
+        </div>
+        <div style="flex:1;">
+          <div class="task-name {{ 'done' if task.status == 'done' else '' }}">{{ task.task_name }}</div>
+          <div class="task-owner">Owned by: <strong>{{ task.owner|capitalize }}</strong></div>
+        </div>
+        <span class="badge {% if task.status == 'done' %}badge-green{% else %}badge-grey{% endif %}">
+          {{ 'Done' if task.status == 'done' else 'Pending' }}
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+{% endfor %}
+
+{% if joiner.evaluations %}
+<div class="card">
+  <div class="card-header">Manager Feedback</div>
+  <div class="card-body">
+    {% for e in joiner.evaluations %}
+    <div class="eval-card">
+      <div class="eval-period">{{ e.period }}-Day Review &middot; {{ e.submitted_at.strftime('%d %b %Y') }}</div>
+      <div class="eval-rating">{% for i in range(e.rating) %}⭐{% endfor %} {{ e.rating }}/5</div>
+      {% if e.strengths %}<div class="text-sm" style="margin-top:6px;"><strong>Strengths:</strong> {{ e.strengths }}</div>{% endif %}
+      {% if e.improvements %}<div class="text-sm" style="margin-top:4px;"><strong>To improve:</strong> {{ e.improvements }}</div>{% endif %}
+      {% if e.goals_next %}<div class="text-sm" style="margin-top:4px;"><strong>Next goals:</strong> {{ e.goals_next }}</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}

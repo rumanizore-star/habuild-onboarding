@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Habuild Onboarding{% endblock %}</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-brand">
+    <h1>HABUILD</h1>
+    <p>Onboarding Platform</p>
+  </div>
+  <nav>
+    <a href="/dashboard">&#9632; Dashboard</a>
+    {% if session.role == 'admin' %}
+    <a href="/add-joiner">&#43; Add New Joiner</a>
+    <a href="/users">&#128101; Manage Users</a>
+    <a href="/add-user">&#43; Add User</a>
+    {% endif %}
+  </nav>
+  <div class="sidebar-footer">
+    <p>Signed in as</p>
+    <strong style="color:white;font-size:13px;">{{ session.name }}</strong>
+    <br><span style="font-size:11px;opacity:0.7;text-transform:capitalize;">{{ session.role }}</span>
+    <br><br>
+    <a href="/logout">Sign Out</a>
+  </div>
+</div>
+<div class="main">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="alert alert-{{ 'success' if cat == 'success' else 'error' }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</div>
+</body>
+</html>

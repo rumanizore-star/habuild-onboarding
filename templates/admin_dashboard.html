@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}HR Dashboard — Habuild{% endblock %}
+{% block content %}
+<div class="page-header flex justify-between items-center">
+  <div>
+    <h2>HR Onboarding Dashboard</h2>
+    <p>Track every new joiner's onboarding journey end-to-end</p>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <form method="POST" action="/admin/reset-tasks" style="display:inline;" onsubmit="return confirm('Are you sure you want to reset all onboarding tasks? This will regenerate tasks for all joiners.');">
+      <button type="submit" class="btn btn-outline btn-sm">🔄 Reset All Tasks</button>
+    </form>
+    <a href="/add-joiner" class="btn btn-primary">&#43; Add New Joiner</a>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="label">Total Joiners</div>
+    <div class="value">{{ total }}</div>
+    <div class="sub">All time</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Active Onboarding</div>
+    <div class="value">{{ active }}</div>
+    <div class="sub">In progress</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Pending Evaluations</div>
+    <div class="value" style="color:{% if pending_evals > 0 %}#f59e0b{% else %}#1565C0{% endif %}">{{ pending_evals }}</div>
+    <div class="sub">Overdue manager reviews</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Completed</div>
+    <div class="value">{{ total - active }}</div>
+    <div class="sub">Fully onboarded</div>
+  </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-body" style="padding:16px 20px;">
+    <form method="GET" action="/dashboard" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+      <div style="flex:2;min-width:160px;">
+        <label class="text-sm text-grey" style="display:block;margin-bottom:4px;">Search name / email</label>
+        <input type="text" name="search" class="form-control" placeholder="Search..." value="{{ filter_search }}">
+      </div>
+      <div style="flex:1;min-width:140px;">
+        <label class="text-sm text-grey" style="display:block;margin-bottom:4px;">Department</label>
+        <select name="dept" class="form-control">
+          <option value="">All departments</option>
+          {% for d in departments %}
+          <option value="{{ d }}" {% if filter_dept == d %}selected{% endif %}>{{ d }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div style="flex:1;min-width:120px;">
+        <label class="text-sm text-grey" style="display:block;margin-bottom:4px;">Status</label>
+        <select name="status" class="form-control">
+          <option value="">All statuses</option>
+          <option value="active" {% if filter_status == 'active' %}selected{% endif %}>Active</option>
+          <option value="completed" {% if filter_status == 'completed' %}selected{% endif %}>Completed</option>
+          <option value="exited" {% if filter_status == 'exited' %}selected{% endif %}>Exited</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button type="submit" class="btn btn-primary">Filter</button>
+        {% if filter_dept or filter_status or filter_search %}
+        <a href="/dashboard" class="btn btn-outline">Clear</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Joiners Table -->
+<div class="card">
+  <div class="card-header">
+    {% if filter_dept or filter_status or filter_search %}
+      Filtered Results <span class="text-sm text-grey" style="font-weight:400;">({{ stats_list|length }} joiner{{ 's' if stats_list|length != 1 }})</span>
+    {% else %}
+      All New Joiners
+    {% endif %}
+    <span class="text-sm text-grey" style="font-weight:400;">Click a name to view full journey</span>
+  </div>
+  <div class="card-body" style="padding:0;">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Location</th>
+            <th>Manager</th>
+            <th>Joining Date</th>
+            <th>Phase</th>
+            <th>Progress</th>
+            <th>Evaluations</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for joiner, stats in stats_list %}
+          <tr>
+            <td>
+              <a href="/joiner/{{ joiner.id }}" style="font-weight:600;">{{ joiner.name }}</a>
+              <div class="text-sm text-grey">{{ joiner.email }}</div>
+              {% if joiner.status != 'active' %}
+              <span class="badge {% if joiner.status == 'completed' %}badge-green{% else %}badge-red{% endif %}" style="margin-top:2px;">{{ joiner.status|capitalize }}</span>
+              {% endif %}
+            </td>
+            <td>{{ joiner.role_title }}</td>
+            <td><span class="badge badge-blue">{{ joiner.location }}</span></td>
+            <td>{{ joiner.manager.name if joiner.manager else '—' }}</td>
+            <td>{{ joiner.joining_date.strftime('%d %b %Y') if joiner.joining_date else '—' }}</td>
+            <td>
+              <span class="badge {% if stats.days_in < 0 %}badge-grey{% elif stats.days_in <= 7 %}badge-blue{% elif stats.days_in <= 30 %}badge-amber{% else %}badge-green{% endif %}">
+                {{ stats.phase }}
+              </span>
+            </td>
+            <td style="min-width:120px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar" style="width:{{ stats.pct }}%;background:{{ stats.color }};"></div>
+                </div>
+                <span class="text-sm" style="font-weight:600;color:{{ stats.color }};">{{ stats.pct }}%</span>
+              </div>
+              <div class="text-sm text-grey">{{ stats.done }}/{{ stats.total }} tasks</div>
+            </td>
+            <td>
+              {% for p in ['30','60','90'] %}
+                {% if p in stats.evals_done %}
+                  <span class="badge badge-green">{{ p }}d ✓</span>
+                {% elif stats.days_in >= p|int %}
+                  <a href="/evaluate/{{ joiner.id }}/{{ p }}" class="badge badge-amber">{{ p }}d Pending</a>
+                {% else %}
+                  <span class="badge badge-grey">{{ p }}d</span>
+                {% endif %}
+              {% endfor %}
+            </td>
+            <td>
+              <a href="/joiner/{{ joiner.id }}" class="btn btn-outline btn-sm">View</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="9" style="text-align:center;padding:32px;color:#6b7280;">
+            {% if filter_dept or filter_status or filter_search %}
+              No joiners match your filters. <a href="/dashboard">Clear filters</a>
+            {% else %}
+              No joiners yet. <a href="/add-joiner">Add the first one.</a>
+            {% endif %}
+          </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

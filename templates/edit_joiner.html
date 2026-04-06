@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Edit {{ joiner.name }} — Habuild{% endblock %}
+{% block content %}
+<div class="page-header">
+  <a href="/joiner/{{ joiner.id }}" class="text-sm text-grey">&#8592; Back to {{ joiner.name }}'s Journey</a>
+  <h2 style="margin-top:6px;">Edit Joiner Details</h2>
+  <p>Update {{ joiner.name }}'s onboarding profile</p>
+</div>
+<div class="card" style="max-width:640px;">
+  <div class="card-header">Joiner Details</div>
+  <div class="card-body">
+    <form method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" name="name" class="form-control" required value="{{ joiner.name }}">
+        </div>
+        <div class="form-group">
+          <label>Official Email *</label>
+          <input type="email" name="email" class="form-control" required value="{{ joiner.email }}">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Role / Title *</label>
+          <input type="text" name="role_title" class="form-control" required value="{{ joiner.role_title }}">
+        </div>
+        <div class="form-group">
+          <label>Department *</label>
+          <select name="department" class="form-control" required>
+            <option value="">Select department</option>
+            {% for d in ['Customer Support','Product','Technology','Operations','Marketing','Finance','HR','Leadership'] %}
+            <option {% if joiner.department == d %}selected{% endif %}>{{ d }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Location *</label>
+          <select name="location" class="form-control" required>
+            <option value="">Select location</option>
+            {% for l in ['Nagpur','Mumbai','Pune','Bangalore','Delhi','Remote'] %}
+            <option {% if joiner.location == l %}selected{% endif %}>{{ l }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Joining Date *</label>
+          <input type="date" name="joining_date" class="form-control" required
+            value="{{ joiner.joining_date.strftime('%Y-%m-%d') if joiner.joining_date else '' }}">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Reporting Manager *</label>
+          <select name="manager_id" class="form-control" required>
+            <option value="">Select manager</option>
+            {% for m in managers %}
+            <option value="{{ m.id }}" {% if joiner.manager_id == m.id %}selected{% endif %}>{{ m.name }} ({{ m.department }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select name="status" class="form-control">
+            <option value="active" {% if joiner.status == 'active' %}selected{% endif %}>Active</option>
+            <option value="completed" {% if joiner.status == 'completed' %}selected{% endif %}>Completed</option>
+            <option value="exited" {% if joiner.status == 'exited' %}selected{% endif %}>Exited</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px;">
+        <a href="/joiner/{{ joiner.id }}" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}{{ period }}-Day Plan — {{ joiner.name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <a href="/joiner/{{ joiner.id }}" class="text-sm text-grey">&#8592; Back to {{ joiner.name }}'s Journey</a>
+  <h2 style="margin-top:6px;">{{ period }}-Day Plan</h2>
+  <p>{{ joiner.name }} &middot; {{ joiner.role_title }} &middot; {{ joiner.department }}</p>
+</div>
+
+{% if existing %}
+<div class="alert alert-success">This plan was last updated on {{ existing.updated_at.strftime('%d %b %Y') }}. You can update it below.</div>
+{% endif %}
+
+<div class="card" style="max-width:680px;">
+  <div class="card-header">{{ period }}-Day Goals &amp; Success Plan</div>
+  <div class="card-body">
+    <form method="POST">
+
+      <div class="form-section">
+        <h3>Goals for the {{ period }}-Day Period</h3>
+        <p class="text-sm text-grey" style="margin-bottom:10px;">What should {{ joiner.name }} achieve by day {{ period }}? List specific, measurable outcomes.</p>
+        <div class="form-group" style="margin:0;">
+          <textarea name="goals" class="form-control" rows="5"
+            placeholder="e.g.&#10;- Complete product knowledge training&#10;- Handle 20+ support tickets independently&#10;- Shadow 3 senior team members">{{ existing.goals if existing else '' }}</textarea>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>KPIs / Success Metrics</h3>
+        <p class="text-sm text-grey" style="margin-bottom:10px;">How will success be measured? List key performance indicators.</p>
+        <div class="form-group" style="margin:0;">
+          <textarea name="kpis" class="form-control" rows="4"
+            placeholder="e.g.&#10;- CSAT score ≥ 4.0&#10;- Response time under 2 hours&#10;- Zero escalations in first month">{{ existing.kpis if existing else '' }}</textarea>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Support &amp; Resources</h3>
+        <p class="text-sm text-grey" style="margin-bottom:10px;">What support, training, or resources will be provided to help {{ joiner.name }} succeed?</p>
+        <div class="form-group" style="margin:0;">
+          <textarea name="support" class="form-control" rows="4"
+            placeholder="e.g.&#10;- Weekly 1:1 with manager&#10;- Access to Habuild learning portal&#10;- Buddy mentorship for first 30 days">{{ existing.support if existing else '' }}</textarea>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px;">
+        <a href="/joiner/{{ joiner.id }}" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">
+          {{ 'Update' if existing else 'Save' }} {{ period }}-Day Plan
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

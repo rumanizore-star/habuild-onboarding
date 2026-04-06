@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Add User — Habuild{% endblock %}
+{% block content %}
+<div class="page-header">
+  <a href="/users" class="text-sm text-grey">&#8592; Back to Users</a>
+  <h2 style="margin-top:6px;">Add Platform User</h2>
+  <p>Create login access for HR, managers, or employees</p>
+</div>
+<div class="card" style="max-width:540px;">
+  <div class="card-header">User Details</div>
+  <div class="card-body">
+    <form method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" name="name" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Official Email *</label>
+          <input type="email" name="email" class="form-control" required placeholder="name@habuild.in">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Password *</label>
+          <input type="text" name="password" class="form-control" required value="Habuild@2026">
+        </div>
+        <div class="form-group">
+          <label>Role *</label>
+          <select name="role" class="form-control" required>
+            <option value="employee">Employee</option>
+            <option value="manager">Manager</option>
+            <option value="admin">Admin (HR)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Department</label>
+          <input type="text" name="department" class="form-control" placeholder="e.g. Customer Support">
+        </div>
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" name="location" class="form-control" placeholder="e.g. Nagpur">
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px;">
+        <a href="/users" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">Create User</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
