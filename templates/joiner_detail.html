@@ -213,26 +213,42 @@
     </div>
     <div class="card-body">
       {% for task in cat_tasks %}
-      <div class="task-item">
-        <form method="POST" action="/task/{{ task.id }}/toggle" style="display:contents;">
-          <input type="hidden" name="status" value="{{ 'pending' if task.status == 'done' else 'done' }}">
-          <button type="submit" style="background:none;border:none;padding:0;cursor:pointer;margin-top:1px;">
-            <div class="task-check {{ 'done' if task.status == 'done' else '' }}" title="Toggle status">
-              {% if task.status == 'done' %}&#10003;{% endif %}
+      <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #f3f4f6;">
+        <div class="task-item">
+          <form method="POST" action="/task/{{ task.id }}/toggle" style="display:contents;">
+            <input type="hidden" name="status" value="{{ 'pending' if task.status == 'done' else 'done' }}">
+            <button type="submit" style="background:none;border:none;padding:0;cursor:pointer;margin-top:1px;">
+              <div class="task-check {{ 'done' if task.status == 'done' else '' }}" title="Toggle status">
+                {% if task.status == 'done' %}&#10003;{% endif %}
+              </div>
+            </button>
+          </form>
+          <div style="flex:1;">
+            <div class="task-name {{ 'done' if task.status == 'done' else '' }}">{{ task.task_name }}</div>
+            <div class="task-owner">
+              Owner: <strong>{{ task.owner|capitalize }}</strong>
+              {% if task.due_date %}&middot; Due: {{ task.due_date.strftime('%d %b') }}{% endif %}
+              {% if task.completed_date %}&middot; <span class="text-green">Done: {{ task.completed_date.strftime('%d %b') }}</span>{% endif %}
             </div>
-          </button>
-        </form>
-        <div style="flex:1;">
-          <div class="task-name {{ 'done' if task.status == 'done' else '' }}">{{ task.task_name }}</div>
-          <div class="task-owner">
-            Owner: <strong>{{ task.owner|capitalize }}</strong>
-            {% if task.due_date %}&middot; Due: {{ task.due_date.strftime('%d %b') }}{% endif %}
-            {% if task.completed_date %}&middot; <span class="text-green">Done: {{ task.completed_date.strftime('%d %b') }}</span>{% endif %}
           </div>
+          <span class="badge {% if task.status == 'done' %}badge-green{% else %}badge-grey{% endif %}">
+            {{ 'Done' if task.status == 'done' else 'Pending' }}
+          </span>
         </div>
-        <span class="badge {% if task.status == 'done' %}badge-green{% else %}badge-grey{% endif %}">
-          {{ 'Done' if task.status == 'done' else 'Pending' }}
-        </span>
+        {% if cat in ['pre_joining', 'day1', 'week1'] %}
+        <div style="margin-top:10px;padding-left:36px;">
+          {% if task.notes %}
+          <div style="background:#f9fafb;border-left:3px solid #1565C0;padding:10px;border-radius:4px;margin-bottom:8px;">
+            <div class="text-sm text-grey" style="font-weight:600;margin-bottom:4px;">Remarks:</div>
+            <div class="text-sm">{{ task.notes }}</div>
+          </div>
+          {% endif %}
+          <form method="POST" action="/task/{{ task.id }}/update-notes" style="display:flex;gap:8px;align-items:flex-end;">
+            <textarea name="notes" class="form-control" rows="2" placeholder="Add remarks/notes..." style="font-size:13px;">{{ task.notes or '' }}</textarea>
+            <button type="submit" class="btn btn-outline btn-sm" style="white-space:nowrap;">Save Notes</button>
+          </form>
+        </div>
+        {% endif %}
       </div>
       {% endfor %}
     </div>

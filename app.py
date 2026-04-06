@@ -451,6 +451,14 @@ def toggle_task(task_id):
     db.session.commit()
     return redirect(request.referrer or url_for('dashboard'))
 
+@app.route('/task/<int:task_id>/update-notes', methods=['POST'])
+@login_required
+def update_task_notes(task_id):
+    task = OnboardingTask.query.get_or_404(task_id)
+    task.notes = request.form.get('notes', '').strip()
+    db.session.commit()
+    return redirect(request.referrer or url_for('dashboard'))
+
 @app.route('/evaluate/<int:joiner_id>/<period>', methods=['GET', 'POST'])
 @login_required
 def evaluate(joiner_id, period):
