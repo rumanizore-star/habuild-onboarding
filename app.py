@@ -21,10 +21,23 @@ def check_password_hash(pwhash, password):
 
 from datetime import datetime, date, timedelta
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file (local dev only)
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = 'habuild-secret-2026'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///habuild_onboarding.db'
+app.secret_key = os.environ.get('SECRET_KEY', 'habuild-secret-2026')
+
+# Database configuration: uses PostgreSQL in production (via DATABASE_URL env var)
+# Falls back to SQLite locally if DATABASE_URL not set or empty
+DATABASE_URL = os.environ.get('DATABASE_URL') or 'sqlite:///habuild_onboarding.db'
+
+# Fix Heroku/Railway-style postgres:// → postgresql:// (SQLAlchemy requires postgresql://)
+if DATABASE_URL.startswith('postgres://'):
+    DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
