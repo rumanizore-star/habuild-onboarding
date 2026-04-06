@@ -420,6 +420,26 @@ def edit_joiner(joiner_id):
         return redirect(url_for('joiner_detail', joiner_id=joiner_id))
     return render_template('edit_joiner.html', joiner=joiner, managers=managers)
 
+@app.route('/joiner/<int:joiner_id>/delete', methods=['POST'])
+@admin_required
+def delete_joiner(joiner_id):
+    joiner = NewJoiner.query.get_or_404(joiner_id)
+    joiner_name = joiner.name
+
+    # Delete all related records
+    OnboardingTask.query.filter_by(joiner_id=joiner_id).delete()
+    Evaluation.query.filter_by(joiner_id=joiner_id).delete()
+    JoinerPlan.query.filter_by(joiner_id=joiner_id).delete()
+    HRNote.query.filter_by(joiner_id=joiner_id).delete()
+    OnboardingPlan.query.filter_by(joiner_id=joiner_id).delete()
+
+    # Delete the joiner
+    db.session.delete(joiner)
+    db.session.commit()
+
+    flash(f'{joiner_name} has been completely deleted.', 'success')
+    return redirect(url_for('dashboard'))
+
 @app.route('/joiner/<int:joiner_id>/add-note', methods=['POST'])
 @login_required
 def add_note(joiner_id):

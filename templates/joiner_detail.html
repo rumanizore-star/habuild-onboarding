@@ -15,7 +15,12 @@
       <div class="text-sm text-grey">{{ stats.done }}/{{ stats.total }} tasks done</div>
     </div>
     {% if session.role == 'admin' %}
-    <a href="/joiner/{{ joiner.id }}/edit" class="btn btn-outline btn-sm">&#9998; Edit Joiner</a>
+    <div style="display:flex;gap:8px;">
+      <a href="/joiner/{{ joiner.id }}/edit" class="btn btn-outline btn-sm">&#9998; Edit Joiner</a>
+      <form method="POST" action="/joiner/{{ joiner.id }}/delete" style="margin:0;" onsubmit="return confirm('Are you sure you want to completely delete {{ joiner.name }}? This action cannot be undone.');">
+        <button type="submit" class="btn btn-outline btn-sm" style="color:#dc2626;border-color:#dc2626;">🗑 Delete</button>
+      </form>
+    </div>
     {% endif %}
   </div>
 </div>
