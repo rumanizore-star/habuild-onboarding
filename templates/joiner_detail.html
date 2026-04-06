@@ -177,10 +177,10 @@
   </div>
 </div>
 
-<!-- 30-60-90 Day Plans (Legacy) -->
+<!-- 30-60-90 Day Goals -->
 {% if session.role in ('admin', 'manager') %}
 <div class="card" style="margin-bottom:24px;">
-  <div class="card-header">Legacy 30-60-90 Day Plans</div>
+  <div class="card-header">30-60-90 day Goals</div>
   <div class="card-body">
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
       {% for period in ['30','60','90'] %}
