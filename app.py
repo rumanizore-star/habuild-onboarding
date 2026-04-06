@@ -570,4 +570,6 @@ def seed():
 
 if __name__ == '__main__':
     seed()
-    app.run(debug=True, port=5050)
+    # Development: debug=True, Production: debug=False
+    debug = os.environ.get('FLASK_ENV') != 'production'
+    app.run(debug=debug, port=5050, host='0.0.0.0')

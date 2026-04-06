@@ -42,5 +42,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 # Expose port
 EXPOSE 5050
 
-# Run Flask application
-CMD ["python", "app.py"]
+# Run with Gunicorn for production
+CMD ["gunicorn", "--workers", "4", "--bind", "0.0.0.0:5050", "app:app"]
