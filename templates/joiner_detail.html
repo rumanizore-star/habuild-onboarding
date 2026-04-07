@@ -154,10 +154,10 @@
             <div class="text-sm">{{ task.notes }}</div>
           </div>
           {% endif %}
-          <form method="POST" action="/task/{{ task.id }}/update-notes" style="display:flex;gap:8px;align-items:flex-end;">
-            <textarea name="notes" class="form-control" rows="2" placeholder="Add remarks/notes..." style="font-size:13px;">{{ task.notes or '' }}</textarea>
-            <button type="submit" class="btn btn-outline btn-sm" style="white-space:nowrap;">Save Notes</button>
-          </form>
+          <div style="display:flex;gap:8px;align-items:flex-end;">
+            <textarea id="notes-{{ task.id }}" class="form-control" rows="2" placeholder="Add remarks/notes..." style="font-size:13px;">{{ task.notes or '' }}</textarea>
+            <button type="button" onclick="saveNotes({{ task.id }})" class="btn btn-outline btn-sm" style="white-space:nowrap;">Save Notes</button>
+          </div>
         </div>
         {% endif %}
       </div>
@@ -328,6 +328,42 @@ function toggleTask(taskId, currentStatus) {
     }
   })
   .catch(error => console.error('Error toggling task:', error));
+}
+
+function saveNotes(taskId) {
+  const notesTextarea = document.getElementById(`notes-${taskId}`);
+  const notes = notesTextarea.value;
+
+  // Make API call to save notes
+  fetch(`/task/${taskId}/update-notes`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-Requested-With': 'XMLHttpRequest'
+    },
+    body: `notes=${encodeURIComponent(notes)}`
+  })
+  .then(response => {
+    if (response.ok) {
+      // Find and update the remarks display
+      const remarksBox = notesTextarea.closest('div').previousElementSibling;
+      if (remarksBox && remarksBox.classList.contains('form-control') === false) {
+        if (notes.trim()) {
+          // Update or create remarks display
+          const existingRemarks = notesTextarea.closest('div').parentElement.querySelector('[style*="border-left"]');
+          if (existingRemarks) {
+            existingRemarks.querySelector('.text-sm:not(.text-grey)').textContent = notes;
+          }
+        }
+      }
+      // Optional: Show success feedback
+      notesTextarea.style.borderColor = '#10b981';
+      setTimeout(() => {
+        notesTextarea.style.borderColor = '';
+      }, 1500);
+    }
+  })
+  .catch(error => console.error('Error saving notes:', error));
 }
 
 function toggleSection(headerElement) {

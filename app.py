@@ -501,6 +501,10 @@ def update_task_notes(task_id):
     task = OnboardingTask.query.get_or_404(task_id)
     task.notes = request.form.get('notes', '').strip()
     db.session.commit()
+
+    # Return JSON for AJAX requests, redirect for form submissions
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({'status': 'success', 'notes': task.notes})
     return redirect(request.referrer or url_for('dashboard'))
 
 @app.route('/evaluate/<int:joiner_id>/<period>', methods=['GET', 'POST'])
