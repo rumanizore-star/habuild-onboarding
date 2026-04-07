@@ -118,14 +118,14 @@
   <div class="card task-section">
     <div class="card-header task-section-header" data-section="{{ cat }}" style="display:flex;justify-content:space-between;align-items:center;cursor:{% if is_collapsible %}pointer{% else %}default{% endif %};" {% if is_collapsible %}onclick="toggleSection(this)"{% endif %}>
       <div style="display:flex;align-items:center;gap:10px;flex:1;">
-        {% if is_collapsible %}<span class="toggle-icon" style="font-size:18px;transition:transform 0.3s;">▼</span>{% endif %}
+        {% if is_collapsible %}<span class="toggle-icon" style="font-size:18px;transition:transform 0.3s;transform:rotate(-90deg);">▼</span>{% endif %}
         <span>{{ cat_labels[cat] }} Tasks</span>
       </div>
       <span class="badge {% if cat_done == cat_tasks|length %}badge-green{% elif cat_done > 0 %}badge-amber{% else %}badge-grey{% endif %}">
         {{ cat_done }}/{{ cat_tasks|length }}
       </span>
     </div>
-    <div class="card-body task-section-body" data-section="{{ cat }}">
+    <div class="card-body task-section-body" data-section="{{ cat }}" {% if is_collapsible %}style="display:none;"{% endif %}>
       {% for task in cat_tasks %}
       <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #f3f4f6;">
         <div class="task-item">
@@ -319,7 +319,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const body = document.querySelector(`[data-section="${sectionName}"].task-section-body`);
 
     if (header && body) {
-      const savedState = localStorage.getItem(`section_${sectionName}`) || 'expanded';
+      // Default to 'collapsed' if no saved state exists (first visit)
+      const savedState = localStorage.getItem(`section_${sectionName}`) || 'collapsed';
       const toggleIcon = header.querySelector('.toggle-icon');
 
       if (savedState === 'collapsed') {
