@@ -116,7 +116,7 @@
   {% set cat_done = cat_tasks | selectattr('status','eq','done') | list | length %}
   {% set is_collapsible = cat in ['pre_joining', 'day1', 'week1'] %}
   <div class="card task-section">
-    <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;cursor:{% if is_collapsible %}pointer{% else %}default{% endif %};" {% if is_collapsible %}onclick="toggleSection(this)"{% endif %}>
+    <div class="card-header task-section-header" data-section="{{ cat }}" style="display:flex;justify-content:space-between;align-items:center;cursor:{% if is_collapsible %}pointer{% else %}default{% endif %};" {% if is_collapsible %}onclick="toggleSection(this)"{% endif %}>
       <div style="display:flex;align-items:center;gap:10px;flex:1;">
         {% if is_collapsible %}<span class="toggle-icon" style="font-size:18px;transition:transform 0.3s;">▼</span>{% endif %}
         <span>{{ cat_labels[cat] }} Tasks</span>
@@ -125,7 +125,7 @@
         {{ cat_done }}/{{ cat_tasks|length }}
       </span>
     </div>
-    <div class="card-body" {% if is_collapsible %}style="display:none;"{% endif %}>
+    <div class="card-body task-section-body" data-section="{{ cat }}">
       {% for task in cat_tasks %}
       <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #f3f4f6;">
         <div class="task-item">
@@ -296,16 +296,41 @@
 
 <script>
 function toggleSection(headerElement) {
+  const sectionName = headerElement.getAttribute('data-section');
   const cardBody = headerElement.nextElementSibling;
   const toggleIcon = headerElement.querySelector('.toggle-icon');
 
   if (cardBody.style.display === 'none') {
     cardBody.style.display = '';
     toggleIcon.style.transform = 'rotate(0deg)';
+    localStorage.setItem(`section_${sectionName}`, 'expanded');
   } else {
     cardBody.style.display = 'none';
     toggleIcon.style.transform = 'rotate(-90deg)';
+    localStorage.setItem(`section_${sectionName}`, 'collapsed');
   }
 }
+
+// Initialize sections on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Apply saved state for collapsible sections
+  ['pre_joining', 'day1', 'week1'].forEach(function(sectionName) {
+    const header = document.querySelector(`[data-section="${sectionName}"].task-section-header`);
+    const body = document.querySelector(`[data-section="${sectionName}"].task-section-body`);
+
+    if (header && body) {
+      const savedState = localStorage.getItem(`section_${sectionName}`) || 'expanded';
+      const toggleIcon = header.querySelector('.toggle-icon');
+
+      if (savedState === 'collapsed') {
+        body.style.display = 'none';
+        if (toggleIcon) toggleIcon.style.transform = 'rotate(-90deg)';
+      } else {
+        body.style.display = '';
+        if (toggleIcon) toggleIcon.style.transform = 'rotate(0deg)';
+      }
+    }
+  });
+});
 </script>
 {% endblock %}
