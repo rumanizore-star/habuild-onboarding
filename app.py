@@ -656,20 +656,6 @@ def view_plan(joiner_id):
     can_edit = session.get('role') == 'admin' or session.get('user_id') == joiner.manager_id
     return render_template('onboarding_plan.html', joiner=joiner, plan=plan, stats=stats, can_edit=can_edit)
 
-@app.route('/admin/reset-tasks', methods=['POST'])
-@admin_required
-def reset_tasks():
-    try:
-        OnboardingTask.query.delete()
-        joiners = NewJoiner.query.all()
-        for joiner in joiners:
-            if joiner.joining_date:
-                create_default_tasks(joiner.id, joiner.joining_date)
-        flash(f'All tasks reset successfully! {len(joiners)} joiners updated.', 'success')
-    except Exception as e:
-        flash(f'Error resetting tasks: {str(e)}', 'error')
-    return redirect(url_for('dashboard'))
-
 # ── SEED DATA ───────────────────────────────────────────────
 
 def seed():
