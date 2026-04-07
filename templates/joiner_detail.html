@@ -129,14 +129,11 @@
       {% for task in cat_tasks %}
       <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #f3f4f6;">
         <div class="task-item">
-          <form method="POST" action="/task/{{ task.id }}/toggle" style="display:contents;">
-            <input type="hidden" name="status" value="{{ 'pending' if task.status == 'done' else 'done' }}">
-            <button type="submit" style="background:none;border:none;padding:0;cursor:pointer;margin-top:1px;">
-              <div class="task-check {{ 'done' if task.status == 'done' else '' }}" title="Toggle status">
-                {% if task.status == 'done' %}&#10003;{% endif %}
-              </div>
-            </button>
-          </form>
+          <button type="button" onclick="toggleTask({{ task.id }}, '{{ task.status }}')" style="background:none;border:none;padding:0;cursor:pointer;margin-top:1px;">
+            <div class="task-check {{ 'done' if task.status == 'done' else '' }}" title="Toggle status" id="check-{{ task.id }}">
+              {% if task.status == 'done' %}&#10003;{% endif %}
+            </div>
+          </button>
           <div style="flex:1;">
             <div class="task-name {{ 'done' if task.status == 'done' else '' }}">{{ task.task_name }}</div>
             <div class="task-owner">
@@ -295,6 +292,44 @@
 {% endif %}
 
 <script>
+function toggleTask(taskId, currentStatus) {
+  const newStatus = currentStatus === 'done' ? 'pending' : 'done';
+  const checkElement = document.getElementById(`check-${taskId}`);
+  const badgeElement = checkElement.closest('.task-item').querySelector('.badge');
+  const taskNameElement = checkElement.closest('.task-item').querySelector('.task-name');
+
+  // Make API call to toggle task
+  fetch(`/task/${taskId}/toggle`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-Requested-With': 'XMLHttpRequest'
+    },
+    body: `status=${newStatus}`
+  })
+  .then(response => {
+    if (response.ok) {
+      // Update UI without reload
+      if (newStatus === 'done') {
+        checkElement.textContent = '✓';
+        checkElement.classList.add('done');
+        badgeElement.textContent = 'Done';
+        badgeElement.classList.remove('badge-grey');
+        badgeElement.classList.add('badge-green');
+        taskNameElement.classList.add('done');
+      } else {
+        checkElement.textContent = '';
+        checkElement.classList.remove('done');
+        badgeElement.textContent = 'Pending';
+        badgeElement.classList.remove('badge-green');
+        badgeElement.classList.add('badge-grey');
+        taskNameElement.classList.remove('done');
+      }
+    }
+  })
+  .catch(error => console.error('Error toggling task:', error));
+}
+
 function toggleSection(headerElement) {
   const sectionName = headerElement.getAttribute('data-section');
   const cardBody = headerElement.nextElementSibling;

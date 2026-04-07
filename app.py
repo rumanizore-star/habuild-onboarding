@@ -489,6 +489,10 @@ def toggle_task(task_id):
         task.completed_date = None
     task.notes = request.form.get('notes', task.notes)
     db.session.commit()
+
+    # Return JSON for AJAX requests, redirect for form submissions
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({'status': 'success', 'new_status': new_status})
     return redirect(request.referrer or url_for('dashboard'))
 
 @app.route('/task/<int:task_id>/update-notes', methods=['POST'])
