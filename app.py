@@ -45,8 +45,11 @@ db = SQLAlchemy(app)
 def migrate_db():
     with app.app_context():
         try:
-            # Add missing columns to new_joiner table if they don't exist
-            from sqlalchemy import text
+            from sqlalchemy import text, inspect
+
+            # Get database inspector
+            inspector = inspect(db.engine)
+            existing_columns = [col['name'] for col in inspector.get_columns('new_joiner')]
 
             missing_columns = {
                 'employment_type': 'VARCHAR(100)',
@@ -57,14 +60,18 @@ def migrate_db():
 
             # Check which columns are missing and add them
             for col_name, col_type in missing_columns.items():
-                try:
-                    db.session.execute(text(f"ALTER TABLE new_joiner ADD COLUMN {col_name} {col_type}"))
-                    db.session.commit()
-                except Exception:
-                    # Column already exists, skip
-                    pass
+                if col_name not in existing_columns:
+                    try:
+                        db.session.execute(text(f"ALTER TABLE new_joiner ADD COLUMN {col_name} {col_type}"))
+                        db.session.commit()
+                    except Exception as e:
+                        db.session.rollback()
+                        pass
         except Exception as e:
-            print(f"Migration warning: {e}")
+            try:
+                db.session.rollback()
+            except:
+                pass
 
 # Initialize database and seed data on app startup
 def init_db():
